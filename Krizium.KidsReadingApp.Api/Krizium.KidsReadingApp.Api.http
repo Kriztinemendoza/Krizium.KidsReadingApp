@@ -1,0 +1,6 @@
+@Krizium.KidsReadingApp.Api_HostAddress = http://localhost:5200
+
+GET {{Krizium.KidsReadingApp.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

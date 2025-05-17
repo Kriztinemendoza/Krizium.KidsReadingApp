@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Krizium.KidsReadingApp.Maui", "Krizium.KidsReadingApp.Maui\Krizium.KidsReadingApp.Maui.csproj", "{2FE3F864-290D-40D9-81F0-F0025ED47C2E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Krizium.KidsReadingApp.Core", "Krizium.KidsReadingApp.Core\Krizium.KidsReadingApp.Core.csproj", "{A856C02E-ECB3-495E-A92A-27F6B9BE0267}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Krizium.KidsReadingApp.Data", "Krizium.KidsReadingApp.Data\Krizium.KidsReadingApp.Data.csproj", "{A54CEB62-E1D5-474F-B2F5-41C24D06DE21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krizium.KidsReadingApp.Api", "Krizium.KidsReadingApp.Api\Krizium.KidsReadingApp.Api.csproj", "{7FABFC29-2033-44BE-9E3A-54F98CC5D78F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2FE3F864-290D-40D9-81F0-F0025ED47C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FE3F864-290D-40D9-81F0-F0025ED47C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FE3F864-290D-40D9-81F0-F0025ED47C2E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{2FE3F864-290D-40D9-81F0-F0025ED47C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FE3F864-290D-40D9-81F0-F0025ED47C2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FE3F864-290D-40D9-81F0-F0025ED47C2E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A856C02E-ECB3-495E-A92A-27F6B9BE0267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A856C02E-ECB3-495E-A92A-27F6B9BE0267}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A856C02E-ECB3-495E-A92A-27F6B9BE0267}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A856C02E-ECB3-495E-A92A-27F6B9BE0267}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A54CEB62-E1D5-474F-B2F5-41C24D06DE21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A54CEB62-E1D5-474F-B2F5-41C24D06DE21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A54CEB62-E1D5-474F-B2F5-41C24D06DE21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A54CEB62-E1D5-474F-B2F5-41C24D06DE21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FABFC29-2033-44BE-9E3A-54F98CC5D78F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FABFC29-2033-44BE-9E3A-54F98CC5D78F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FABFC29-2033-44BE-9E3A-54F98CC5D78F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FABFC29-2033-44BE-9E3A-54F98CC5D78F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E32C538E-20C2-4345-A2FF-BD70482778AC}
+	EndGlobalSection
+EndGlobal

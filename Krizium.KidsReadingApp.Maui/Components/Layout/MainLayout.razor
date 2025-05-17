@@ -1,0 +1,105 @@
+﻿@* @inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div> *@
+
+@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="main">
+        <div class="top-bar">
+            <div class="app-title">
+                <a href="/">Kids Reading App</a>
+            </div>
+        </div>
+
+        <article class="content">
+            @Body
+        </article>
+    </div>
+</div>
+
+<style>
+    .page {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+    }
+
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .top-bar {
+        background-color: #4a6ea9;
+        color: white;
+        padding: 10px 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .app-title {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .app-title a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .content {
+        flex: 1;
+        overflow: auto;
+    }
+
+  
+</style>
+
+<style>
+    .not-found {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+        .not-found h1 {
+            color: #4a6ea9;
+            margin-bottom: 16px;
+        }
+
+    .btn-primary {
+        display: inline-block;
+        background-color: #4a6ea9;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        margin-top: 20px;
+        font-weight: bold;
+    }
+</style>

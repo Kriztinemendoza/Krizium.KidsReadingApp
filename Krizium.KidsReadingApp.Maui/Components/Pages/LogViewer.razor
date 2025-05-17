@@ -1,0 +1,415 @@
+﻿@page "/logs"
+@using Microsoft.Extensions.Logging;
+@using Krizium.KidsReadingApp.Maui.Services.Logging
+@using System.IO
+@inject LogManager LogManager
+@inject ILogger<LogViewer> Logger
+@implements IDisposable
+
+<div class="log-viewer">
+    <h1>Application Logs</h1>
+    
+    <div class="log-actions">
+        <button @onclick="RefreshLogs" class="refresh-button">
+            <span class="oi oi-reload"></span> Refresh
+        </button>
+        <button @onclick="ExportLogs" class="export-button">
+            <span class="oi oi-data-transfer-download"></span> Export
+        </button>
+        <button @onclick="ClearDisplay" class="clear-button">
+            <span class="oi oi-trash"></span> Clear Display
+        </button>
+    </div>
+    
+    <div class="filter-controls">
+        <div class="filter-group">
+            <label for="filterText">Filter:</label>
+            <input id="filterText" @bind="filterText" @bind:event="oninput" placeholder="Filter log content..." />
+        </div>
+        
+        <div class="filter-group">
+            <label>Log Level:</label>
+            <div class="level-filters">
+                <label class="level-option">
+                    <input type="checkbox" @bind="showDebug" />
+                    <span class="level debug">Debug</span>
+                </label>
+                <label class="level-option">
+                    <input type="checkbox" @bind="showInfo" />
+                    <span class="level info">Info</span>
+                </label>
+                <label class="level-option">
+                    <input type="checkbox" @bind="showWarning" />
+                    <span class="level warning">Warning</span>
+                </label>
+                <label class="level-option">
+                    <input type="checkbox" @bind="showError" />
+                    <span class="level error">Error</span>
+                </label>
+                <label class="level-option">
+                    <input type="checkbox" @bind="showCritical" />
+                    <span class="level critical">Critical</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="filter-group">
+            <label for="maxLines">Max Lines:</label>
+            <select id="maxLines" @bind="maxLines">
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+                <option value="5000">5000</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="log-content @(isLoading ? "loading" : "")">
+        @if (isLoading)
+        {
+            <div class="spinner"></div>
+        }
+        else if (string.IsNullOrEmpty(filteredLogContent))
+        {
+            <div class="no-logs">
+                <p>No log entries match the current filters.</p>
+            </div>
+        }
+        else
+        {
+            <pre>@filteredLogContent</pre>
+        }
+    </div>
+    
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="status-message @(isError ? "error" : "")">
+            @statusMessage
+        </div>
+    }
+</div>
+
+@code {
+    private string logContent = "";
+    private string filteredLogContent = "";
+    private string filterText = "";
+    private bool showDebug = true;
+    private bool showInfo = true;
+    private bool showWarning = true;
+    private bool showError = true;
+    private bool showCritical = true;
+    private int maxLines = 1000;
+    private bool isLoading = false;
+    private string statusMessage = "";
+    private bool isError = false;
+    private System.Threading.Timer refreshTimer;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshLogs();
+        
+        // Set up a timer to refresh logs every 30 seconds
+        refreshTimer = new System.Threading.Timer(async _ => 
+        {
+            await InvokeAsync(async () => 
+            {
+                await RefreshLogs();
+                StateHasChanged();
+            });
+        }, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+    }
+    
+    private async Task RefreshLogs()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+            
+            logContent = await LogManager.GetLogsContentAsync(maxLines);
+            ApplyFilters();
+            
+            isLoading = false;
+            statusMessage = $"Logs refreshed at {DateTime.Now.ToString("HH:mm:ss")}";
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            isLoading = false;
+            statusMessage = $"Error loading logs: {ex.Message}";
+            isError = true;
+            Logger.LogError(ex, "Error refreshing logs");
+        }
+        
+        StateHasChanged();
+    }
+    
+    private void ApplyFilters()
+    {
+        if (string.IsNullOrEmpty(logContent))
+        {
+            filteredLogContent = "";
+            return;
+        }
+        
+        var lines = logContent.Split(Environment.NewLine);
+        var filteredLines = new List<string>();
+        
+        foreach (var line in lines)
+        {
+            // Apply text filter
+            if (!string.IsNullOrEmpty(filterText) && !line.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+            
+            // Apply log level filters
+            if (line.Contains("[Debug]") && !showDebug) continue;
+            if (line.Contains("[Information]") && !showInfo) continue;
+            if (line.Contains("[Warning]") && !showWarning) continue;
+            if (line.Contains("[Error]") && !showError) continue;
+            if (line.Contains("[Critical]") && !showCritical) continue;
+            
+            // Apply colorization based on log level
+            filteredLines.Add(line);
+        }
+        
+        filteredLogContent = string.Join(Environment.NewLine, filteredLines);
+    }
+    
+    private async Task ExportLogs()
+    {
+        try
+        {
+            statusMessage = "Exporting logs...";
+            isError = false;
+            StateHasChanged();
+            
+            var exportPath = await LogManager.ExportLogsAsync();
+            
+            if (!string.IsNullOrEmpty(exportPath))
+            {
+                statusMessage = $"Logs exported to: {exportPath}";
+            }
+            else
+            {
+                statusMessage = "Failed to export logs.";
+                isError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error exporting logs: {ex.Message}";
+            isError = true;
+            Logger.LogError(ex, "Error exporting logs");
+        }
+        
+        StateHasChanged();
+    }
+    
+    private void ClearDisplay()
+    {
+        filteredLogContent = "";
+        statusMessage = "Display cleared. Click Refresh to reload logs.";
+        isError = false;
+        StateHasChanged();
+    }
+    
+    // Re-apply filters when filter settings change
+    private void OnFilterChanged()
+    {
+        ApplyFilters();
+        StateHasChanged();
+    }
+    
+    // Property change handlers
+    private bool _showDebug;
+    public bool ShowDebug 
+    { 
+        get => _showDebug; 
+        set 
+        { 
+            _showDebug = value;
+            OnFilterChanged();
+        }
+    }
+    
+    // Similar handlers for other properties
+    
+    public void Dispose()
+    {
+        refreshTimer?.Dispose();
+    }
+}
+
+<style>
+    .log-viewer {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 16px;
+    }
+    
+    h1 {
+        color: #4a6ea9;
+        margin-bottom: 16px;
+    }
+    
+    .log-actions {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    
+    .log-actions button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .refresh-button {
+        background-color: #4a6ea9;
+    }
+    
+    .export-button {
+        background-color: #28a745;
+    }
+    
+    .clear-button {
+        background-color: #dc3545;
+    }
+    
+    .filter-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 16px;
+        padding: 12px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .filter-group label {
+        font-weight: 500;
+        font-size: 14px;
+    }
+    
+    .filter-group input[type="text"] {
+        padding: 6px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        width: 200px;
+    }
+    
+    .filter-group select {
+        padding: 6px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    
+    .level-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .level-option {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+    }
+    
+    .level {
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: white;
+    }
+    
+    .level.debug {
+        background-color: #6c757d;
+    }
+    
+    .level.info {
+        background-color: #17a2b8;
+    }
+    
+    .level.warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    .level.error {
+        background-color: #dc3545;
+    }
+    
+    .level.critical {
+        background-color: #721c24;
+    }
+    
+    .log-content {
+        flex: 1;
+        overflow: auto;
+        background-color: #212529;
+        color: #f8f9fa;
+        padding: 16px;
+        border-radius: 4px;
+        font-family: monospace;
+        position: relative;
+    }
+    
+    .log-content.loading {
+        opacity: 0.7;
+    }
+    
+    .log-content pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 4px solid white;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    
+  
+    .no-logs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        color: #adb5bd;
+    }
+    
+    .status-message {
+        margin-top: 16px;
+        padding: 8px 16px;
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border-radius: 4px;
+    }
+    
+    .status-message.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>

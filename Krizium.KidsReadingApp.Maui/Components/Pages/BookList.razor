@@ -1,0 +1,207 @@
+﻿@page "/"
+@page "/books"
+@using Krizium.KidsReadingApp.Core.Models
+@using Krizium.KidsReadingApp.Maui.Services
+@inject BookLibraryDataService BookService
+@inject NavigationManager NavManager
+
+<div class="book-library">
+    <h1>Reading Books</h1>
+
+    @if (isLoading)
+    {
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading books...</p>
+        </div>
+    }
+    else if (books == null || !books.Any())
+    {
+        <div class="no-books">
+            <p>No books available right now.</p>
+            <p>Check back later!</p>
+        </div>
+    }
+    else
+    {
+        <div class="books-grid">
+            @foreach (var book in books)
+            {
+                <div class="book-card" @onclick="() => OpenBook(book.Id)">
+                    <div class="book-cover">
+                        @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                        {
+                            <img src="@book.CoverImageUrl" alt="Cover of @book.Title" />
+                        }
+                        else
+                        {
+                            <div class="default-cover">
+                                <span>@book.Title.Substring(0, 1)</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="book-info">
+                        <h3>@book.Title</h3>
+                        <p class="author">By @book.Author</p>
+                        <p class="age-range">Ages @book.AgeRangeMin-@book.AgeRangeMax</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Book> books;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBooksAsync();
+    }
+
+    private async Task LoadBooksAsync()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            // Get online books
+            books = await BookService.GetAllBooksAsync();
+
+            // TODOIf no online books, try getting offline books
+            // if (books == null || !books.Any())
+            // {
+            //     books = await BookService.GetOfflineBooksAsync();
+            // }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading books: {ex.Message}");
+            books = new List<Book>();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OpenBook(int bookId)
+    {
+        // Navigate to the first page of the book
+        NavManager.NavigateTo($"/book/{bookId}/page/1");
+    }
+}
+
+<style>
+    .book-library {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    h1 {
+        color: #4a6ea9;
+        text-align: center;
+        margin-bottom: 24px;
+        font-family: 'ComicNeueBold', 'Comic Sans MS', cursive, sans-serif;
+    }
+
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 20px;
+        padding: 0 8px;
+    }
+
+    .book-card {
+        background-color: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+
+    .book-cover {
+        height: 180px;
+        overflow: hidden;
+        position: relative;
+        background-color: #f0f0f0;
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .default-cover {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #4a6ea9;
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+    }
+
+    .book-info {
+        padding: 12px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-info h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: #333;
+        line-height: 1.3;
+    }
+
+    .author {
+        font-size: 14px;
+        color: #666;
+        margin: 0 0 4px 0;
+    }
+
+    .age-range {
+        font-size: 12px;
+        color: #888;
+        margin: 0;
+        margin-top: auto;
+    }
+
+    .loading, .no-books {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border-left-color: #4a6ea9;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+
+   
+</style>

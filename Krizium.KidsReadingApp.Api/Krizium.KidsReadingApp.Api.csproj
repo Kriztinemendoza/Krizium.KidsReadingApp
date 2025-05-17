@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\**" />
+    <Compile Remove="logs\**" />
+    <Content Remove="Data\**" />
+    <Content Remove="logs\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="logs\**" />
+    <None Remove="Data\**" />
+    <None Remove="logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="apiProgram.cs" />
+  </ItemGroup>
+
+ <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+ <ItemGroup>
+   <ProjectReference Include="..\Krizium.KidsReadingApp.Core\Krizium.KidsReadingApp.Core.csproj" />
+   <ProjectReference Include="..\Krizium.KidsReadingApp.Data\Krizium.KidsReadingApp.Data.csproj" />
+ </ItemGroup>
+
+
+</Project>
